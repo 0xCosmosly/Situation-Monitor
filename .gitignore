@@ -3,3 +3,6 @@ node_modules/
 _metadata/
 *.zip
 *.log
+
+# Development Scripts
+_dev_scripts/

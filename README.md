@@ -39,4 +39,4 @@ This extension is powered by vanilla JavaScript, CSS, and HTML. No heavy framewo
 - `embedded-wheel-bridge.js` is a content script injected into the video iframes to let you scroll and control volume across cross-origin boundaries seamlessly!
 
 ---
-*Created as a personal tool to solve a personal problem, now open-sourced for anyone who needs to monitor all the things.*
+*I'm monitoring the Chrome extension situation...*

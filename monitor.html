@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Situation Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <div id="top-chrome" class="top-chrome">
+        <header class="topbar">
+          <div class="brand-block">
+            <p class="eyebrow">Chrome extension</p>
+            <h1 style="margin: 0; line-height: 1;">Situation Monitor</h1>
+            <p class="subtitle" style="margin: 4px 0 0 0; font-size: 14px; color: var(--text-soft);"><span id="version-copy"></span></p>
+            <form id="inline-add-feed-form" class="inline-add-feed" style="margin-top: 16px; display: flex; gap: 12px; align-items: center; max-width: 480px; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 12px; border: 1px solid var(--border);">
+              <input id="inline-feed-url" type="text" inputmode="url" required placeholder="https://example.com/video" autocapitalize="off" autocomplete="off" spellcheck="false" style="flex: 1; padding: 10px 16px; border-radius: 8px; border: none; background: transparent; color: var(--text); font-size: 15px; outline: none; box-shadow: none;">
+              <button class="button button-primary" type="submit" style="white-space: nowrap; border-radius: 8px; padding: 10px 20px;">Add Video</button>
+            </form>
+          </div>
+
+          <div class="topbar-statuses">
+            <section class="status-item status-item-compact status-item-load" aria-label="Playback health">
+              <span class="status-label">Playback health</span>
+              <span id="load-value" class="status-value">Waiting for feeds</span>
+              <span id="load-hint" class="status-meta">Buffering time, dropped frames, and startup delay show how hard the page is working.</span>
+            </section>
+
+            <section class="status-stack" aria-label="Monitor status">
+              <div class="status-item status-item-compact">
+                <span class="status-label">Videos displayed</span>
+                <span id="feed-count" class="status-value">0</span>
+                <span id="feed-count-breakdown" class="status-meta">0 horizontal<br>0 vertical</span>
+              </div>
+              
+            </section>
+
+            <section class="status-item status-item-memory" aria-label="Storage path">
+              <span id="storage-heading" class="status-label">Saved in Chrome</span>
+              <span id="storage-label" class="status-value">Saved in Chrome</span>
+
+              <label class="status-toggle" for="clear-on-close-toggle">
+                <input id="clear-on-close-toggle" type="checkbox">
+                <span>Clear feeds when this extension closes</span>
+              </label>
+            </section>
+          </div>
+
+          <div class="topbar-actions">
+            <button id="manage-button" class="button button-secondary" type="button" aria-expanded="false">Manage Feed</button>
+            <button id="clear-all-top-button" class="button button-danger" type="button">Clear All</button>
+            <button id="restart-all-button" class="button button-primary" type="button">Restart All</button>
+            <button id="pause-all-button" class="button button-neutral" type="button">Pause All</button>
+          </div>
+        </header>
+      </div>
+
+      <p id="message-bar" class="message-bar" hidden aria-live="polite"></p>
+      <main class="workspace">
+        <section class="grid-section" aria-label="Video monitor grid">
+          <div id="feed-grid" class="feed-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="panel-scrim" class="panel-scrim" hidden></div>
+
+    <aside id="control-panel" class="control-panel" aria-label="Feed controls" aria-hidden="true">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Feed setup</p>
+          <h2>Manage feeds</h2>
+        </div>
+
+        <button id="close-panel-button" class="button button-ghost" type="button" aria-label="Close" style="font-size: 20px; padding: 4px 8px; line-height: 1;">✕</button>
+      </div>
+
+      <p id="memory-note" class="memory-note" style="display: none;" hidden></p>
+
+      <section class="form-section" aria-label="Add or change a feed">
+        <div class="section-head">
+          <h3 id="form-heading">Add a feed</h3>
+          <button id="reset-form-button" class="button button-ghost" type="button">Clear</button>
+        </div>
+
+        <form id="feed-form" class="feed-form">
+          <input id="feed-id" type="hidden">
+
+          <label class="field">
+            <span>Link</span>
+            <input id="feed-url" type="text" inputmode="url" required placeholder="https://example.com/live-feed" autocapitalize="off" autocomplete="off" spellcheck="false">
+          </label>
+
+          <label class="field checkbox-field" style="display: none;">
+            <input id="feed-vertical" type="checkbox">
+            <span>Vertical video</span>
+          </label>
+
+          <div class="form-actions">
+            <button id="save-feed-button" class="button button-primary" type="submit">Add video</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="saved-section" aria-label="Saved feeds">
+        <div class="section-head">
+          <h3>Saved feeds</h3>
+          <span id="slot-remaining" class="slot-remaining">16 slots left</span>
+        </div>
+
+        <div id="feed-list" class="feed-list"></div>
+
+        <div class="bulk-actions">
+          <button id="clear-all-button" class="button button-ghost" type="button">Clear all feeds</button>
+          <button id="cancel-clear-all-button" class="button button-ghost" type="button" style="display: none !important;" hidden>Cancel</button>
+        </div>
+        <p id="clear-all-note" class="clear-all-note" hidden></p>
+      </section>
+
+    
+      <section class="supported-section" aria-label="Supported sites" style="margin-top: 24px;">
+        <div class="section-head">
+          <h3>Supported Sites</h3>
+        </div>
+        <p class="panel-copy" style="font-size: 15px; line-height: 1.5; margin-top: 8px;">
+          YouTube, Vimeo, DailyMotion, Loom, Streamable. Normal video links (.mp4, .webm) are also fully supported.
+
+<br><br>Some websites block being shown inside another page. If a tile stays blank, that site is blocking embeds.
+        </p>
+      </section>
+    </aside>
+
+    <script src="monitor.js"></script>
+  </body>
+</html>
